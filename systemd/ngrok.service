@@ -1,0 +1,25 @@
+# ═══════════════════════════════════════════════════════════════
+# ngrok.service  —  copy to /etc/systemd/system/ngrok.service
+# ═══════════════════════════════════════════════════════════════
+# Replace YOUR_STATIC_DOMAIN, YOUR_HOME and YOUR_USERNAME before installing.
+#
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now ngrok
+
+[Unit]
+Description=ngrok static tunnel (port 3000)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+ExecStart=YOUR_HOME/.local/bin/ngrok http \
+  --domain=YOUR_STATIC_DOMAIN \
+  3000 \
+  --log=stdout
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════════
+# void-herald.service  —  copy to /etc/systemd/system/void-herald.service
+# ═══════════════════════════════════════════════════════════════
+# Replace YOUR_USERNAME, YOUR_HOME and BOT_PATH before installing.
+#
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now void-herald
+
+[Unit]
+Description=void-herald Discord Bot (Node.js)
+After=network.target ngrok.service
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+WorkingDirectory=YOUR_HOME/cedric/void-herald
+ExecStart=/usr/bin/node index.js
+Restart=on-failure
+RestartSec=5
+EnvironmentFile=YOUR_HOME/void-herald/.env
+Environment=HOME=YOUR_HOME
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
