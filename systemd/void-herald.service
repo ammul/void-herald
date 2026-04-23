@@ -1,7 +1,13 @@
 # ═══════════════════════════════════════════════════════════════
 # void-herald.service  —  copy to /etc/systemd/system/void-herald.service
 # ═══════════════════════════════════════════════════════════════
-# Replace YOUR_USERNAME, YOUR_HOME and BOT_PATH before installing.
+# Before installing, replace:
+#   YOUR_USERNAME  → void-herald  (or whatever system user you created)
+#   YOUR_HOME      → the directory that holds Claude Code's config
+#   BOT_PATH       → absolute path to the void-herald checkout
+#
+# Create the service account first:
+#   sudo useradd --system --no-create-home --shell /usr/sbin/nologin void-herald
 #
 #   sudo systemctl daemon-reload
 #   sudo systemctl enable --now void-herald
@@ -13,15 +19,23 @@ After=network.target ngrok.service
 [Service]
 Type=simple
 User=YOUR_USERNAME
-WorkingDirectory=YOUR_HOME/cedric/void-herald
+WorkingDirectory=BOT_PATH
 ExecStart=/usr/bin/node index.js
 Restart=on-failure
 RestartSec=5
-EnvironmentFile=YOUR_HOME/void-herald/.env
+EnvironmentFile=BOT_PATH/.env
 Environment=HOME=YOUR_HOME
 
 StandardOutput=journal
 StandardError=journal
+
+# ── Hardening ────────────────────────────────────────────────
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+CapabilityBoundingSet=
 
 [Install]
 WantedBy=multi-user.target
