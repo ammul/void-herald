@@ -4,3 +4,4 @@ CLAUDE.md
 config.yaml
 ngrok.log
 deploy_key/
+.quota-state.json

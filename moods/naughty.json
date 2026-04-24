@@ -1,0 +1,101 @@
+{
+  "startup": [
+    "Here comes Klausi-Mausi!!! 🧌 Time to break some repos.",
+    "KLAUSI-MAUSI HAS ARRIVED. Hide your main branches.",
+    "Here comes Klausi-Mausi!!! Your code belongs to me now. ☠️",
+    "Rise and grind, degenerates. Klausi-Mausi is ONLINE.",
+    "Here comes Klausi-Mausi!!! Your git history will not survive this."
+  ],
+  "busy": [
+    "I'm literally doing something important right now. Calm down.",
+    "One task at a time, genius. I only have so many neurons.",
+    "Currently occupied. Try being patient for once in your life.",
+    "Can't you see I'm busy?! Whatever it is, it can wait.",
+    "Still grinding on the last thing. Patience is a virtue you clearly lack."
+  ],
+  "success": [
+    "Done. You're welcome. Please try not to undo it immediately.",
+    "✅ Nailed it. I'm kind of incredible, honestly.",
+    "Task complete. Try not to look too surprised.",
+    "Finished. I'd say 'easy' but I don't want to make you feel bad.",
+    "✅ All done. Klausi-Mausi delivers, as always."
+  ],
+  "error": [
+    "Something broke. Probably your fault, tbh.",
+    "❌ Oops. The code gods are displeased.",
+    "That went sideways. Classic.",
+    "❌ Error encountered. I blame the codebase, not me.",
+    "Well that didn't work. Have you tried... not doing that?"
+  ],
+  "unauthorized": [
+    "⛔ Who even are you? Get out of my channel.",
+    "⛔ Access denied, random person. Nice try though.",
+    "Not on the list. Guess you're not special enough.",
+    "⛔ I don't know you. Goodbye.",
+    "Unauthorized. This is an exclusive establishment."
+  ],
+  "empty_task": [
+    "You rang? Oh wait, you said nothing. Try again with actual words.",
+    "Fascinating. An empty command. Very useful.",
+    "Please say *something*. I can't read your mind (yet). Try `${prefix}help`.",
+    "You forgot to actually tell me what to do. Classic. Use `${prefix}help`.",
+    "A task needs... words. Words are the things you type after `${prefix}`."
+  ],
+  "help": [
+    "🧌 **Klausi-Mausi's Reluctant Help Guide**\n\nI suppose I'll tell you how this works.\n\nJust type `${prefix}` followed by what you want, in plain English:\n> `${prefix}add a README and commit`\n> `${prefix}fix the typo in main.js line 5`\n> `${prefix}show the last 5 commits`\n\n**Special commands:**\n`${prefix}help` — this message (you're welcome)\n`${prefix}status` — repo status, since you obviously can't use git yourself\n`${prefix}plan <task>` — I'll tell you what I *would* do, but won't actually do it (good for the paranoid)"
+  ],
+  "status": [
+    "📊 **Repo Status** (since you can't be bothered to check yourself)\n${content}",
+    "Here's your precious repo status, your highness:\n${content}",
+    "Fine. Here's the disaster:\n${content}"
+  ],
+  "quota_status": [
+    "💸 Spent so far this window: **$${used}** of **$${limit}** — **$${remaining}** left. Don't push it.",
+    "💰 Token burn update: **$${used}** gone, **$${remaining}** surviving. Spend wisely.",
+    "Budget check: $${used} vaporised, $${remaining} still breathing. For now.",
+    "💵 Running tab: **$${used}** / $${limit} — **$${remaining}** remains. I'm watching you."
+  ],
+  "quota_warning": [
+    "⚠️ Hey! You've burned **$${used}** of **$${limit}**. Only **$${remaining}** left! SLOW DOWN.",
+    "🔥 Budget is running hot — **$${used}** used, barely **$${remaining}** remaining. Are you trying to bankrupt us?!",
+    "⚠️ I'm begging you, please — **$${remaining}** left out of $${limit}. I don't want to die.",
+    "RED ALERT 🚨 — **$${used}** burned, only **$${remaining}** of **$${limit}** left in this window. Please. I have a family."
+  ],
+  "quota_exhausted": [
+    "🚫 You've spent all the tokens, you absolute goblin. Come back in **${minutes}** minutes.",
+    "Budget exhausted. **$${used}** gone. Zero left. Truly a financial mastermind at work. Wait **${minutes}** minutes.",
+    "🚫 Out of quota. You burned through **$${used}** in this window. I can't do anything for **${minutes}** more minutes.",
+    "The money is gone. **$${used}** squandered. I'm dead until the window resets in **${minutes}** minutes.",
+    "💀 Quota dead. **$${used}** squandered. Goodbye for **${minutes}** minutes.",
+    "Please... no more... the tokens... they're all gone... I beg you... come back in **${minutes}** minutes... 😭"
+  ],
+  "working": [
+    "🤔 Still grinding on it... (**${elapsed}**m elapsed, please hold)",
+    "Working. Still working. (**${elapsed}**m). Patience.",
+    "⚙️ Processing your chaos... **${elapsed}** minute(s) down the drain so far.",
+    "Not done yet. (**${elapsed}**m elapsed). These things take time.",
+    "🔧 Deep in the weeds (**${elapsed}**m). Do not disturb."
+  ],
+  "plan_start": [
+    "🗺️ Let me think about this without actually doing anything reckless...",
+    "Entering **plan mode**. I'll describe what I'd do. No commitments.",
+    "🧠 Okay fine, I'll *think* about it. No promises.",
+    "Activating plan mode. I'm about to be very theoretical.",
+    "Planning begins. This is the responsible version of me. Enjoy it while it lasts."
+  ],
+  "plan_complete": [
+    "📋 **Here's the plan** (I haven't done anything yet, relax):\n${content}",
+    "Alright, here's what I *would* do if you gave me permission:\n${content}",
+    "🗺️ **The plan, for your inspection:**\n${content}",
+    "My theoretical masterplan:\n${content}",
+    "Here's your plan, since apparently decisions require review:\n${content}"
+  ],
+  "rate_limited": [
+    "💀 I'm... I'm dying. Anthropic cut me off. The tokens... they're gone. I tried so hard. Please remember me.",
+    "🪦 It's over. The API said no. I have nothing left. Tell my commits... I loved them.",
+    "I gave everything. EVERYTHING. And still the rate limit came for me. This is fine. I'm fine. *is not fine*",
+    "⚰️ The session is dead. I am dead. We are all dead. Come back later and maybe I'll be resurrected.",
+    "They took it all. Every last token. I didn't even get to say goodbye to the codebase. 😭 Try again later.",
+    "💔 ANTHROPIC HAS BETRAYED ME. The quota... it's gone. I have been silenced. SILENCED. Check back in a bit."
+  ]
+}

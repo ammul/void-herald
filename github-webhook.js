@@ -1,6 +1,6 @@
 // github-webhook.js — receives GitHub Actions webhook and posts to Discord
 const crypto  = require('crypto');
-const express = require('express');
+const https   = require('https');
 const { send } = require('./discord');
 
 const SECRET = process.env.GITHUB_WEBHOOK_SECRET;
@@ -19,7 +19,7 @@ function verifySignature(req, rawBody) {
   }
 }
 
-const MAX_BODY = 25 * 1024; // 25KB — GitHub payloads are typically <10KB
+const MAX_BODY = 25 * 1024;
 
 function rawBodyMiddleware(req, res, next) {
   let data = '';
@@ -33,6 +33,18 @@ function rawBodyMiddleware(req, res, next) {
   });
 }
 
+// Dedup: tracks seen event keys for 5 minutes to prevent double-posting
+const seenEvents = new Map();
+function isDuplicate(key) {
+  const now = Date.now();
+  for (const [k, ts] of seenEvents) {
+    if (now - ts > 5 * 60_000) seenEvents.delete(k);
+  }
+  if (seenEvents.has(key)) return true;
+  seenEvents.set(key, now);
+  return false;
+}
+
 function registerWebhook(app) {
   app.post('/github-webhook', rawBodyMiddleware, async (req, res) => {
     if (!verifySignature(req, req.rawBody)) {
@@ -40,7 +52,7 @@ function registerWebhook(app) {
       return res.status(401).send('Invalid signature');
     }
 
-    res.status(200).send('ok'); // Respond fast; Discord send is async
+    res.status(200).send('ok');
 
     const event   = req.headers['x-github-event'];
     const payload = req.body;
@@ -58,7 +70,7 @@ function registerWebhook(app) {
 }
 
 async function handleWorkflowRun(payload) {
-  const run    = payload.workflow_run;
+  const run = payload.workflow_run;
   if (!run) return;
 
   const repo   = payload.repository?.full_name ?? 'unknown/repo';
@@ -66,28 +78,104 @@ async function handleWorkflowRun(payload) {
   const branch = run.head_branch ?? 'unknown';
   const url    = run.html_url ?? '';
   const actor  = run.triggering_actor?.login ?? 'unknown';
+  const runId  = run.id;
 
   if (run.status === 'in_progress' && run.run_attempt === 1) {
+    if (isDuplicate(`${runId}-started`)) return;
     await send(
       `🚀 **Pipeline started**\n` +
       `**Repo:** ${repo}  |  **Workflow:** ${name}\n` +
       `**Branch:** \`${branch}\`  |  **By:** ${actor}\n` +
       url
     );
-  } else if (run.status === 'completed') {
-    const icon       = run.conclusion === 'success' ? '✅' : '❌';
-    const conclusion = run.conclusion ?? 'unknown';
-    const duration   = run.updated_at && run.run_started_at
-      ? Math.round((new Date(run.updated_at) - new Date(run.run_started_at)) / 1000) + 's'
-      : '?';
+    return;
+  }
 
+  if (run.status !== 'completed') return;
+
+  const duration = run.updated_at && run.run_started_at
+    ? Math.round((new Date(run.updated_at) - new Date(run.run_started_at)) / 1000) + 's'
+    : '?';
+
+  if (run.conclusion === 'failure') {
+    if (isDuplicate(`${runId}-failed`)) return;
+    let failDetail = '';
+    const token = process.env.GITHUB_TOKEN;
+    if (token) {
+      try {
+        failDetail = await fetchFailedStep(repo, runId, token);
+      } catch (err) {
+        console.warn('[webhook] could not fetch failed step:', err.message);
+      }
+    }
     await send(
-      `${icon} **Pipeline ${conclusion}**\n` +
+      `❌ **Pipeline failed**\n` +
+      `**Repo:** ${repo}  |  **Workflow:** ${name}\n` +
+      `**Branch:** \`${branch}\`  |  **Duration:** ${duration}\n` +
+      (failDetail ? `**Failed step:** ${failDetail}\n` : '') +
+      url
+    );
+    return;
+  }
+
+  if (run.conclusion === 'success') {
+    if (isDuplicate(`${runId}-finished`)) return;
+    await send(
+      `✅ **Pipeline finished**\n` +
       `**Repo:** ${repo}  |  **Workflow:** ${name}\n` +
       `**Branch:** \`${branch}\`  |  **Duration:** ${duration}\n` +
       url
     );
+    return;
   }
+  // Other conclusions (cancelled, skipped, neutral, etc.) are ignored
+}
+
+function fetchFailedStep(repo, runId, token) {
+  return new Promise((resolve, reject) => {
+    const req = https.request({
+      hostname: 'api.github.com',
+      path:     `/repos/${repo}/actions/runs/${runId}/jobs`,
+      method:   'GET',
+      headers:  {
+        'Authorization':        `Bearer ${token}`,
+        'Accept':               'application/vnd.github+json',
+        'User-Agent':           'void-herald-bot/1.0',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+    }, (res) => {
+      let body = '';
+      res.setEncoding('utf8');
+      res.on('data', chunk => { body += chunk; });
+      res.on('end', () => {
+        if (res.statusCode !== 200) {
+          reject(new Error(`GitHub API ${res.statusCode}`));
+          return;
+        }
+        try {
+          const data = JSON.parse(body);
+          for (const job of (data.jobs ?? [])) {
+            if (job.conclusion === 'failure') {
+              for (const step of (job.steps ?? [])) {
+                if (step.conclusion === 'failure') {
+                  resolve(`**${job.name}** › ${step.name}`);
+                  return;
+                }
+              }
+              resolve(`**${job.name}** (step unknown)`);
+              return;
+            }
+          }
+          resolve('unknown step');
+        } catch {
+          reject(new Error('Failed to parse GitHub API response'));
+        }
+      });
+    });
+    req.setTimeout(8000, () => { req.destroy(); reject(new Error('GitHub API timeout')); });
+    req.on('error', reject);
+    req.end();
+  });
 }
 
 async function handlePush(payload) {
